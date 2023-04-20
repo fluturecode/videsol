@@ -1,25 +1,22 @@
-// Import necessary Solana SDK structs and macros
 use solana_program::{
     account_info::{next_account_info, AccountInfo},
     entrypoint,
     entrypoint::ProgramResult,
     msg,
     program_error::ProgramError,
-    program_pack::{IsInitialized, Pack, Sealed},
     pubkey::Pubkey,
-    system_instruction,
-    sysvar::{rent::Rent, Sysvar},
 };
 
-// Import video account models
-mod video_account;
-use video_account::VideoAccount;
+entrypoint!(process_instruction);
 
-// Define the program ID
-solana_program::declare_id!("YOUR_PROGRAM_ID");
+#[derive(Accounts)]
+pub struct StoreVideo<'info> {
+    #[account(init, payer = user, space = 8 + name_len + desc_len + content_len)]
+    video_account: AccountInfo<'info>,
+    #[account(mut)]
+    user: AccountInfo<'info>,
+}
 
-// Define the entry point for your program
-#[entrypoint]
 fn entry(program_id: &Pubkey, accounts: &[AccountInfo], instruction_data: &[u8]) -> ProgramResult {
     // Match on the instruction data to determine which instruction was called
     match instruction_data[0] {
